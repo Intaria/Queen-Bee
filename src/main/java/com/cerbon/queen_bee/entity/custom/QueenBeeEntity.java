@@ -42,24 +42,27 @@ import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animatable.GeoEntity;
-import software.bernie.geckolib.core.animatable.GeoAnimatable;
-import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.core.animatable.instance.SingletonAnimatableInstanceCache;
-import software.bernie.geckolib.core.animation.AnimationState;
-import software.bernie.geckolib.core.animation.*;
-import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib3.core.AnimationState;
+import software.bernie.geckolib3.core.IAnimatable;
+import software.bernie.geckolib3.core.PlayState;
+import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import software.bernie.geckolib3.core.builder.ILoopType;
+import software.bernie.geckolib3.core.controller.AnimationController;
+import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
+import software.bernie.geckolib3.core.manager.AnimationData;
+import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 import java.util.UUID;
 
-public class QueenBeeEntity extends PathfinderMob implements GeoEntity, FlyingAnimal, NeutralMob {
+public class QueenBeeEntity extends PathfinderMob implements IAnimatable, FlyingAnimal, NeutralMob {
     private static final EntityDataAccessor<Integer> DATA_REMAINING_ANGER_TIME = SynchedEntityData.defineId(QueenBeeEntity.class, EntityDataSerializers.INT);
     private UUID persistentAngerTarget;
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(39, 58);
-    private final AnimatableInstanceCache cache = new SingletonAnimatableInstanceCache(this);
     private int underWaterTicks;
     private int poisonNimbusCooldown;
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
     private final ServerBossEvent bossInfo = new ServerBossEvent(this.getDisplayName(), ServerBossEvent.BossBarColor.YELLOW, ServerBossEvent.BossBarOverlay.PROGRESS);
 
 
@@ -131,7 +134,7 @@ public class QueenBeeEntity extends PathfinderMob implements GeoEntity, FlyingAn
 
     @Override
     public boolean doHurtTarget(Entity pEntity) {
-        boolean flag = pEntity.hurt(this.damageSources().sting(this), (float)((int)this.getAttributeValue(Attributes.ATTACK_DAMAGE)));
+        boolean flag = pEntity.hurt(DamageSource.sting(this), (float)((int)this.getAttributeValue(Attributes.ATTACK_DAMAGE)));
         if(flag){
             this.doEnchantDamageEffects(this, pEntity);
             if(pEntity instanceof LivingEntity){
@@ -169,7 +172,7 @@ public class QueenBeeEntity extends PathfinderMob implements GeoEntity, FlyingAn
                   areaEffectCloud.setOwner(this);
                   areaEffectCloud.setDuration(QueenBeeModCommonConfigs.POISON_NIMBUS_DURATION.get());
                   areaEffectCloud.setRadius(QueenBeeModCommonConfigs.POISON_NIMBUS_RADIUS.get());
-                  areaEffectCloud.setFixedColor(8889187);
+                  areaEffectCloud.setFixedColor(5149489);
                   areaEffectCloud.addEffect(new MobEffectInstance(MobEffects.POISON, QueenBeeModCommonConfigs.POISON_EFFECT_DURATION.get(), QueenBeeModCommonConfigs.POISON_EFFECT_AMPLIFIER.get()));
                   this.level.addFreshEntity(areaEffectCloud);
               }
@@ -221,7 +224,7 @@ public class QueenBeeEntity extends PathfinderMob implements GeoEntity, FlyingAn
         }
 
         if(this.underWaterTicks > 20){
-            this.hurt(this.damageSources().drown(), 1.0F);
+            this.hurt(DamageSource.DROWN, 1.0F);
         }
 
         if (!this.level.isClientSide) {
@@ -308,28 +311,28 @@ public class QueenBeeEntity extends PathfinderMob implements GeoEntity, FlyingAn
     }
 
     @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
-        controllerRegistrar.add(new AnimationController<>(this, "controller", 4, this::predicate));
-        controllerRegistrar.add(new AnimationController<>(this, "attackController", 4, this::attackPredicate));
+    public void registerControllers(AnimationData data) {
+        data.addAnimationController(new AnimationController<>(this, "controller", 4, this::predicate));
+        data.addAnimationController(new AnimationController<>(this, "attackController", 4, this::attackPredicate));
     }
 
-    private <T extends GeoAnimatable> PlayState predicate(AnimationState<T> tAnimationState) {
-        tAnimationState.getController().setAnimation(RawAnimation.begin().then("animation.queen_bee.idle", Animation.LoopType.LOOP));
+    private <T extends IAnimatable> PlayState predicate(AnimationEvent<T> event) {
+        event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.queen_bee.idle", ILoopType.EDefaultLoopTypes.LOOP));
         return PlayState.CONTINUE;
     }
 
-    private <T extends GeoAnimatable> PlayState attackPredicate(AnimationState<T> tAnimationState) {
-        if (this.swinging && tAnimationState.getController().getAnimationState().equals(AnimationController.State.STOPPED)){
-            tAnimationState.getController().forceAnimationReset();
-            tAnimationState.getController().setAnimation(RawAnimation.begin().then("animation.queen_bee.attack", Animation.LoopType.PLAY_ONCE));
+    private <T extends IAnimatable> PlayState attackPredicate(AnimationEvent<T> event) {
+        if (this.swinging && event.getController().getAnimationState().equals(AnimationState.Stopped)){
+            event.getController().markNeedsReload();
+            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.queen_bee.attack", ILoopType.EDefaultLoopTypes.PLAY_ONCE));
             this.swinging = false;
         }
         return PlayState.CONTINUE;
     }
 
     @Override
-    public AnimatableInstanceCache getAnimatableInstanceCache() {
-        return cache;
+    public AnimationFactory getFactory() {
+        return this.factory;
     }
 
     static class PoisonNimbusAreaEffectCloud extends AreaEffectCloud{

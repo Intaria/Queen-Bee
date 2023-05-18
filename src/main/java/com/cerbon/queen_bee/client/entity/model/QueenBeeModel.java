@@ -3,9 +3,9 @@ package com.cerbon.queen_bee.client.entity.model;
 import com.cerbon.queen_bee.QueenBeeMod;
 import com.cerbon.queen_bee.entity.custom.QueenBeeEntity;
 import net.minecraft.resources.ResourceLocation;
-import software.bernie.geckolib.model.GeoModel;
+import software.bernie.geckolib3.model.AnimatedGeoModel;
 
-public class QueenBeeModel extends GeoModel<QueenBeeEntity> {
+public class QueenBeeModel extends AnimatedGeoModel<QueenBeeEntity> {
     @Override
     public ResourceLocation getModelResource(QueenBeeEntity animatable) {
         return new ResourceLocation(QueenBeeMod.MOD_ID, "geo/queen_bee.geo.json");
