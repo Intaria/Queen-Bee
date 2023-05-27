@@ -315,12 +315,12 @@ public class QueenBeeEntity extends PathfinderMob implements IAnimatable, Flying
         data.addAnimationController(new AnimationController<>(this, "controller", 4, this::predicate));
         data.addAnimationController(new AnimationController<>(this, "attackController", 4, this::attackPredicate));
     }
-
     private <T extends IAnimatable> PlayState predicate(AnimationEvent<T> event) {
         event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.queen_bee.idle", ILoopType.EDefaultLoopTypes.LOOP));
         return PlayState.CONTINUE;
     }
 
+    //TODO: Fix attack animation not animating the bone "bigger_body"
     private <T extends IAnimatable> PlayState attackPredicate(AnimationEvent<T> event) {
         if (this.swinging && event.getController().getAnimationState().equals(AnimationState.Stopped)){
             event.getController().markNeedsReload();
