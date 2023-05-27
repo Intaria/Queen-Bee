@@ -6,19 +6,6 @@
       "animation_length": 2,
       "bones": {
         "all_body": {
-          "rotation": {
-            "0.0": {
-              "vector": [0, 0, 0]
-            },
-            "1.0": {
-              "vector": [5, 0, 0],
-              "easing": "easeInOutQuad"
-            },
-            "2.0": {
-              "vector": [0, 0, 0],
-              "easing": "easeInOutQuad"
-            }
-          },
           "position": {
             "0.0": {
               "vector": [0, 0, 0]
@@ -267,7 +254,6 @@
       }
     },
     "animation.queen_bee.attack": {
-      "loop": true,
       "animation_length": 0.58333,
       "bones": {
         "all_body": {
@@ -454,5 +440,6 @@
         }
       }
     }
-  }
+  },
+  "geckolib_format_version": 2
 }
