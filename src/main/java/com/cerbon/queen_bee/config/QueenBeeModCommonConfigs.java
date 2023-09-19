@@ -29,7 +29,6 @@ public class QueenBeeModCommonConfigs {
     public static final ForgeConfigSpec.ConfigValue<Integer> STINGER_SWORD_POISON_EFFECT_AMPLIFIER;
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_POISON_EFFECT;
     public static final ForgeConfigSpec.ConfigValue<Integer> STINGER_SWORD_COOLDOWN;
-    public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_STINGER_SWORD_TOOLTIP;
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_ANTENNA;
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_ANTENNA_BUMBLEZONE_DIMENSION;
     public static final ForgeConfigSpec.ConfigValue<Boolean> ENABLE_ANTENNA_TOOLTIP;
@@ -96,8 +95,6 @@ public class QueenBeeModCommonConfigs {
                 .define("Poison Effect Amplifier", 0);
         STINGER_SWORD_COOLDOWN = BUILDER.comment("Sets Stinger Sword cooldown in ticks after using right click ability. DEFAULT: 900")
                         .define("Stinger Sword Cooldown", 900);
-        ENABLE_STINGER_SWORD_TOOLTIP = BUILDER.comment("If false will disable stinger sword tooltip. DEFAULT: TRUE")
-                        .define("Enable Stinger Sword Tooltip", true);
 
         BUILDER.pop();
 

@@ -74,52 +74,12 @@ public class StingerSwordItem extends SwordItem {
 
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, @NotNull Player pPlayer, @NotNull InteractionHand pUsedHand) {
-        if (QueenBeeModCommonConfigs.ENABLE_CURE_BEE.get()) {
-            if (pPlayer.isCrouching() && pPlayer.getItemBySlot(EquipmentSlot.HEAD).getItem() == QueenBeeModItems.ANTENNA.get()) {
-                Bee bee = EntityType.BEE.create(pLevel);
-                if (bee != null) {
-                    bee.moveTo(pPlayer.getX(), pPlayer.getY() + 1, pPlayer.getZ());
-                    bee.setInvulnerable(true);
-                    bee.setNoAi(true);
-                    pLevel.addFreshEntity(bee);
-                }
-                AreaEffectCloud areaEffectCloud = new AreaEffectCloud(pLevel, pPlayer.getX(), pPlayer.getY(), pPlayer.getZ());
-                areaEffectCloud.setOwner(pPlayer);
-                areaEffectCloud.setDuration(QueenBeeModCommonConfigs.REGENERATION_AREA_EFFECT_CLOUD_DURATION.get());
-                areaEffectCloud.setRadius(QueenBeeModCommonConfigs.REGENERATION_AREA_EFFECT_CLOUD_RADIUS.get());
-                areaEffectCloud.setFixedColor(13458603);
-                areaEffectCloud.addEffect(new MobEffectInstance(MobEffects.REGENERATION, QueenBeeModCommonConfigs.REGENERATION_EFFECT_DURATION.get(), QueenBeeModCommonConfigs.REGENERATION_EFFECT_AMPLIFIER.get()));
-                pLevel.addFreshEntity(areaEffectCloud);
-                int delay = (int) (areaEffectCloud.getDuration() * 58.5);
-
-                pPlayer.swing(pUsedHand);
-                pPlayer.getCooldowns().addCooldown(this, QueenBeeModCommonConfigs.STINGER_SWORD_COOLDOWN.get());
-
-                // I think this is not the best way to do it. Not sure to be honest.
-                // TODO: Find a better way to schedule the bee death
-                new Timer().schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        if (bee != null){
-                            bee.remove(Entity.RemovalReason.KILLED);
-                        }
-                    }
-                }, delay);
-            }
-        }
         return super.use(pLevel, pPlayer, pUsedHand);
     }
 
 
     @Override
     public void appendHoverText(@NotNull ItemStack pStack, @Nullable Level pLevel, @NotNull List<Component> pTooltipComponents, @NotNull TooltipFlag pIsAdvanced) {
-        if (QueenBeeModCommonConfigs.ENABLE_CURE_BEE.get() && QueenBeeModCommonConfigs.ENABLE_STINGER_SWORD_TOOLTIP.get()) {
-            if (Screen.hasShiftDown()) {
-                pTooltipComponents.add(Component.translatable("tooltip." + QueenBeeMod.MOD_ID + ".stinger_sword").withStyle(ChatFormatting.YELLOW));
-            } else {
-                pTooltipComponents.add(Component.translatable("tooltip." + QueenBeeMod.MOD_ID + ".item.shift_up").withStyle(ChatFormatting.YELLOW));
-            }
-        }
         super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
     }
 }
